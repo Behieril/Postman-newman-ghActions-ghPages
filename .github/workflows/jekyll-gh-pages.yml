@@ -1,35 +1,36 @@
-name: Create newman report
+name: Postman-Newman-ghActions
 on:
   push:
-    branches:
-      - main
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 jobs:
-  report:
+  test:
+    timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-      - name: Install Node
-        uses: actions/setup-node@v1
-        with:
-          node-version: "16.x"
-      - name: Install newman
-        run: |
-          npm install -g newman
-          npm install -g newman-reporter-htmlextra
-      - name: Run POSTMAN collection
-        continue-on-error: true
-        run: |
-          npx newman run petstore.collection.json -r cli,htmlextra --reporter-htmlextra-export ./testResults/index.html
-      - name: Deploy report page
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-         github_token: ${{ secrets.NEWMAN_TOKEN }}
-         publish_dir: ./testResults
-         user_name: 'github-actions[bot]'
-         user_email: 'github-actions[bot]@users.noreply.github.com'
-      - name: Output the run Details
-        uses: actions/upload-artifact@v2
-        with:
-          name: testResults
-          path: ./testResults
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3.5.1
+      with:
+        node-version: '16.0.0'
+    - name: Install dependencies
+      run: npm ci
+    - name: Run Newman Tests
+      run: npm run newman-run
+    - uses: actions/upload-artifact@v3.1.0
+      if: always()
+      with:
+        name: report
+        path: newman/
+        retention-days: 30
+    - name: Push to repository
+      uses: cpina/github-action-push-to-another-repository@main
+      if: always()
+      env:
+        API_TOKEN_GITHUB: ${{ secrets.ACCESS_TOKEN }}
+      with:
+        source-directory: 'newman'
+        destination-github-username: 'Bihierils'
+        destination-repository-name: 'Postman-Newman-ghActions'
+        user-email: roman.bobokov@gmail.com
+        target-branch: report
