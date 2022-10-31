@@ -12,7 +12,7 @@ jobs:
             - name: Install Node
               uses: actions/setup-node@v1
               with:
-                  node-version: "12.x"
+                  node-version: "16.x"
             - name: Install newman
               run: |
                   npm install -g newman
@@ -28,8 +28,10 @@ jobs:
                   publish_dir: ./newman
                   user_name: "github-actions[bot]"
                   user_email: "github-actions[bot]@users.noreply.github.com"
+            - name: Make Directory for results
+              run: mkdir -p testResults
             - name: Output the run Details
               uses: actions/upload-artifact@v2
               with:
                   name: Newman
-                  path: ./newman/index.html
+                  path: testResults
