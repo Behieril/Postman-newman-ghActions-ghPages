@@ -17,6 +17,15 @@ products:
     price: 30
     sku: 999921312423312
     description: awesome
+  - name: banana
+    price: 155
+    sku: 123321123
+    description: changed description
+    id: 4
+  - price: 999
+    sku: null
+    description: description
+    id: 6
 orders:
   - id: 1
     name: order1
